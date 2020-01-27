@@ -16,12 +16,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+
 import com.example.android.roomwordssample.ResultView;
 
 import static com.example.android.roomwordssample.ResultView.NEW_WORD_ACTIVITY_REQUEST_CODE;
@@ -43,22 +48,22 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
     SharedPreferences sharedPreferences;
     Vibrator vibrator;
 
-    MediaPlayer click,click2,gameMusic,crowd;
+    MediaPlayer click, click2, gameMusic, crowd;
     TextView textViewPlayer1, textViewPlayer2;
 
-    ImageView [] imageArray = new ImageView[12];
+    ImageView[] imageArray = new ImageView[12];
 
     Integer[] cardArray = {101, 102, 103, 104, 105, 106, 201, 202, 203, 204, 205, 206};
 
-    long[] pattern = {0,200,200,200};
+    long[] pattern = {0, 200, 200, 200};
 
     int p_101, p_102, p_103, p_104, p_105, p_106, p_201, p_202, p_203, p_204, p_205, p_206;
     int[] drawableArray = {p_101, p_102, p_103, p_104, p_105, p_106, p_201, p_202, p_203, p_204, p_205, p_206};
 
-    int[] idArray = {R.id._11,R.id._12,R.id._13,R.id._14,R.id._21,R.id._22,R.id._23,R.id._24,R.id._31,R.id._32,R.id._33,R.id._34};
+    int[] idArray = {R.id._11, R.id._12, R.id._13, R.id._14, R.id._21, R.id._22, R.id._23, R.id._24, R.id._31, R.id._32, R.id._33, R.id._34};
 
     int firstCard, secondCard;
-    int clickedFirst,clickedSecond;
+    int clickedFirst, clickedSecond;
 
     int cardNumber = 1;
     int turn = 1;
@@ -70,15 +75,32 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
     LinearLayout linearLayoutImage;
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memorie);
 
+        final WordListAdapter adapter = new WordListAdapter(this);
+
+        mWordViewModel = new ViewModelProvider(this).get(WordViewModel.class);
+
+        // Add an observer on the LiveData returned by getAlphabetizedWords.
+        // The onChanged() method fires when the observed data changes and the activity is
+        // in the foreground.
+        mWordViewModel.getAllWords().observe(this, new Observer<List<Word>>() {
+                    @Override
+                    public void onChanged(@Nullable final List<Word> words) {
+                        // Update the cached copy of the words in the adapter.
+                        adapter.setWords(words);
+                    }
+                });
+
         counter = 0;
 
         relativeLayout1 = (RelativeLayout) findViewById(R.id.relativLayout1);
-        linearLayoutImage = (LinearLayout)findViewById(R.id.linearimage);
+        linearLayoutImage = (LinearLayout) findViewById(R.id.linearimage);
 
         colorLightBlue1 = Color.BLUE;
         colorLightBlack2 = Color.BLACK;
@@ -89,15 +111,15 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        gameMusic = MediaPlayer.create(MemorieActivity.this,R.raw.relax);
-        crowd = MediaPlayer.create(MemorieActivity.this,R.raw.crowd);
-        click = MediaPlayer.create(MemorieActivity.this,R.raw.click2);
-        click2 = MediaPlayer.create(MemorieActivity.this,R.raw.clickik);
+        gameMusic = MediaPlayer.create(MemorieActivity.this, R.raw.relax);
+        crowd = MediaPlayer.create(MemorieActivity.this, R.raw.crowd);
+        click = MediaPlayer.create(MemorieActivity.this, R.raw.click2);
+        click2 = MediaPlayer.create(MemorieActivity.this, R.raw.clickik);
 
-        textViewPlayer1 =  findViewById(R.id.textView1);
-        textViewPlayer2 =  findViewById(R.id.textView2);
+        textViewPlayer1 = findViewById(R.id.textView1);
+        textViewPlayer2 = findViewById(R.id.textView2);
 
-        for(int i = 0; i < 12; i++){
+        for (int i = 0; i < 12; i++) {
 
             imageArray[i] = (ImageView) findViewById(idArray[i]);
             imageArray[i].setTag(Integer.toString(i));
@@ -111,11 +133,12 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+
     @Override
     public void onClick(View v) {
 
-        for (int z = 0; z<12; z++) {
-            if (v.getId() == imageArray[z].getId()){
+        for (int z = 0; z < 12; z++) {
+            if (v.getId() == imageArray[z].getId()) {
 
                 click.start();
                 vibrator.vibrate(50);
@@ -126,37 +149,37 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         gameMusic.seekTo(mediaLenght);
 
-        check2 = sharedPreferences.getBoolean("DARKMODE",false);
-        check1 = sharedPreferences.getBoolean("MUSIC",false);
+        check2 = sharedPreferences.getBoolean("DARKMODE", false);
+        check1 = sharedPreferences.getBoolean("MUSIC", false);
 
-        if (check1){
+        if (check1) {
             gameMusic.start();
         }
         //change color of player
-        if (!check2){
+        if (!check2) {
             textViewPlayer1.setTextColor(colorLightBlue1);
             textViewPlayer2.setTextColor(colorLightBlack2);
-        }else {
+        } else {
             textViewPlayer1.setTextColor(colorDarkGreen1);
             textViewPlayer2.setTextColor(colorDarkWhite2);
         }
 
-        if(!check2){
+        if (!check2) {
             relativeLayout1.setBackgroundResource(R.drawable.trinangle_white);
             // linearLayoutImage.setBackgroundResource(R.drawable.andi2);
 
-        }else{
+        } else {
             relativeLayout1.setBackgroundResource(R.drawable.triangle_black);
             //  linearLayoutImage.setBackgroundResource(R.drawable.circle);
         }
     }
 
-    public void onPause(){
+    public void onPause() {
         super.onPause();
 
         gameMusic.pause();
@@ -198,9 +221,9 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
 
             firstCard = cardArray[card];
 
-            if(firstCard > 200){
+            if (firstCard > 200) {
 
-                firstCard = firstCard -100;
+                firstCard = firstCard - 100;
 
             }
             cardNumber = 2;
@@ -212,7 +235,7 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
 
             secondCard = cardArray[card];
 
-            if (secondCard > 200){
+            if (secondCard > 200) {
 
                 secondCard = secondCard - 100;
 
@@ -221,7 +244,7 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
             clickedSecond = card;
 
 
-            for (int k = 0; k<12; k++){
+            for (int k = 0; k < 12; k++) {
                 imageArray[k].setEnabled(false);
             }
 
@@ -273,7 +296,7 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
             counter++;
 
 
-        }else {
+        } else {
             for (int t = 0; t < 12; t++) {
 
                 imageArray[t].setImageResource(R.drawable.fz12);
@@ -307,7 +330,7 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
         }
 
 
-        for(int w = 0; w<12; w++){
+        for (int w = 0; w < 12; w++) {
             imageArray[w].setEnabled(true);
         }
 
@@ -316,26 +339,23 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
+    private void checkEnd() {
 
 
-    private void checkEnd () {
-
-
-
-
-
-        if (counter == 6){
+        if (counter == 6) {
 
             crowd.start();
 
             AlertDialog.Builder alertDiologBuilder = new AlertDialog.Builder(MemorieActivity.this);
 
-            if (playerPoints>player2Points){
-                alertDiologBuilder.setMessage("Game Over! Spieler 1 hat gewonnen\nP1: "+ playerPoints + "\nP2: " + player2Points);
-            } if (playerPoints<player2Points){
-                alertDiologBuilder.setMessage("Game Over! Spieler 2 hat gewonnen\nP1: "+ playerPoints + "\nP2: " + player2Points);
-            } if (playerPoints==player2Points){
-                alertDiologBuilder.setMessage("Game Over! Unentschieden\nP1: "+ playerPoints + "\nP2: " + player2Points);
+            if (playerPoints > player2Points) {
+                alertDiologBuilder.setMessage("Game Over! Spieler 1 hat gewonnen\nP1: " + playerPoints + "\nP2: " + player2Points);
+            }
+            if (playerPoints < player2Points) {
+                alertDiologBuilder.setMessage("Game Over! Spieler 2 hat gewonnen\nP1: " + playerPoints + "\nP2: " + player2Points);
+            }
+            if (playerPoints == player2Points) {
+                alertDiologBuilder.setMessage("Game Over! Unentschieden\nP1: " + playerPoints + "\nP2: " + player2Points);
             }
             alertDiologBuilder.setCancelable(false);
 
@@ -344,49 +364,45 @@ public class MemorieActivity extends AppCompatActivity implements View.OnClickLi
                 public void onClick(DialogInterface dialog, int which) {
                     intent = new Intent(MemorieActivity.this, NewWordActivity.class);
                     startActivityForResult(intent, NEW_WORD_ACTIVITY_REQUEST_CODE);
-                    finish();
-
-                    //  intent = new Intent(getApplicationContext(), MemorieActivity.class);
-                    //startActivity(intent);
-                }
-
-
-                public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                   MemorieActivity.super.onActivityResult(requestCode, resultCode, data);
-
-                    if (requestCode == NEW_WORD_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-                        Word word = new Word(data.getStringExtra(NewWordActivity.EXTRA_REPLY));
-                        mWordViewModel.insert(word);
-                    } else {
-                        Toast.makeText(
-                                getApplicationContext(),
-                                R.string.empty_not_saved,
-                                Toast.LENGTH_LONG).show();
-                    }
                 }
             });
             AlertDialog alertDialog = alertDiologBuilder.create();
             alertDialog.show();
+        }
+    }
+
+
+
+    public void onActivityResult ( int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == NEW_WORD_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            Word result = new Word(data.getStringExtra(NewWordActivity.EXTRA_REPLY));
+             mWordViewModel.insert(result);
+             intent = new Intent(MemorieActivity.this, MainActivity.class);
+             startActivity(intent);
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    R.string.empty_not_saved,
+                    Toast.LENGTH_LONG).show();
 
         }
-
     }
+        private void frontOfCardsResources () {
 
+            drawableArray[0] = R.drawable.i_101;
+            drawableArray[1] = R.drawable.i_102;
+            drawableArray[2] = R.drawable.i_103;
+            drawableArray[3] = R.drawable.i_104;
+            drawableArray[4] = R.drawable.i_105;
+            drawableArray[5] = R.drawable.i_106;
+            drawableArray[6] = R.drawable.i_201;
+            drawableArray[7] = R.drawable.i_202;
+            drawableArray[8] = R.drawable.i_203;
+            drawableArray[9] = R.drawable.i_204;
+            drawableArray[10] = R.drawable.i_205;
+            drawableArray[11] = R.drawable.i_206;
 
-    private void frontOfCardsResources () {
-
-        drawableArray[0] = R.drawable.i_101;
-        drawableArray[1] = R.drawable.i_102;
-        drawableArray[2] = R.drawable.i_103;
-        drawableArray[3] = R.drawable.i_104;
-        drawableArray[4] = R.drawable.i_105;
-        drawableArray[5] = R.drawable.i_106;
-        drawableArray[6] = R.drawable.i_201;
-        drawableArray[7] = R.drawable.i_202;
-        drawableArray[8] = R.drawable.i_203;
-        drawableArray[9] = R.drawable.i_204;
-        drawableArray[10] = R.drawable.i_205;
-        drawableArray[11] = R.drawable.i_206;
-
-    }
+        }
 }

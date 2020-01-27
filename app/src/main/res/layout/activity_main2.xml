@@ -19,19 +19,20 @@
         android:id="@+id/button500"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
-        android:text="Play"
-        android:orientation="horizontal"
         android:layout_gravity="center"
         android:background="@drawable/my_button"
+        android:orientation="horizontal"
+        android:text="Play"
         android:textColor="#00ff00"
 
-         />
+        />
 
     <Button
         android:id="@+id/button600"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:text="Highscore"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal"
         android:layout_gravity="center"
         android:background="@drawable/my_button"
@@ -43,6 +44,7 @@
         android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:text="Settings"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal"
         android:layout_gravity="center"
         android:background="@drawable/my_button"
