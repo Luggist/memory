@@ -64,18 +64,14 @@ public class ResultView extends AppCompatActivity {
             }
         });
 
-        //FloatingActionButton fab = findViewById(R.id.fab);
-        //fab.setOnClickListener(new View.OnClickListener() {
-           // @Override
-           // public void onClick(View view) {
-                //Intent intent = new Intent(ResultView.this, NewWordActivity.class);
-                //startActivityForResult(intent, NEW_WORD_ACTIVITY_REQUEST_CODE);
-           // }
-
-        //});
-
-
-
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ResultView.this, NewWordActivity.class);
+                startActivityForResult(intent, NEW_WORD_ACTIVITY_REQUEST_CODE);
+            }
+        });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
